@@ -1,4 +1,4 @@
 Thunder-simulation
 ==================
 
-Simulating thunder
+Simulating thunder using JavaScript
