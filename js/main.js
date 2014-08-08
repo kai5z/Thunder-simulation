@@ -159,10 +159,11 @@ var plot = document.getElementById('plot');
 
 
     $(canvas).mousedown(function(event) {
+        var mouse_pos = {x: event.pageX - $(this).offset().left, y: event.pageY - $(this).offset().top};
 
         console.log("Mouse down");
         mouse_dragging = true;
-        listener.x = event.offsetX*settings.scale;
+        listener.x = mouse_pos.x*settings.scale;
         $("#lightning_distance").text(Math.abs((listener.x-lightning.main[0].x)/1000).toFixed(2));
         redraw();
     });
@@ -176,9 +177,11 @@ var plot = document.getElementById('plot');
     });
     $(canvas).mousemove(function(event) {
         if(mouse_dragging) {
-            if(event.offsetX > canvas.width || event.offsetX < 0)
+            var mouse_pos = {x: event.pageX - $(this).offset().left, y: event.pageY - $(this).offset().top};
+
+            if(mouse_pos.x > canvas.width || mouse_pos.x < 0)
                 return;
-            listener.x = event.offsetX*settings.scale;
+            listener.x = mouse_pos.x*settings.scale;
             $("#lightning_distance").text(Math.abs(LightningGenerator.dist(listener,lightning.main[0])/1000).toFixed(2));
             redraw();
         }
