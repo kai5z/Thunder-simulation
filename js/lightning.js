@@ -55,16 +55,16 @@ var LightningGenerator =
     generate_lightning_point: function(p, v1, v2, v3, z_delta) {
         //Variables loosely based on Rakov et al. ("Lightning, physics and effects") p. 378
         var segment = {
-            length: this.normal(40, 10) * 65 + 5,
-            theta: this.normal(16, 16) / 180.0 * Math.PI,
+            length: this.normal(40, 10) + 5,
+            theta: this.normal(30, 5) / 180.0 * Math.PI, //stats say average 16
             phi: Math.random() * 2.0 * Math.PI
         };
 
         //Constraints, 1
         if (segment.length < 3.5) segment.length = 3.5;
         if (segment.length > 70.0) segment.length = 70.0;
-        if (segment.theta > Math.PI) segment.theta = Math.PI;
         if (segment.theta < 0) segment.theta = -segment.theta;
+        if (segment.theta > Math.PI) segment.theta = Math.PI;
 
         //New point based on segment
         var new_p = {x: segment.length * Math.sin(segment.theta) * Math.cos(segment.phi),
@@ -146,11 +146,15 @@ var LightningGenerator =
     generate_lightning: function(x_pos, y_pos, height, width, branch_p) {
         var lightning_points, p, v1, v2, v3, branches;
         var branches = [];
+        var z_trend = 2.5, i = 0, ideal_z = 0;
 
         function reset_lightning() {
             //Array of points
             lightning_points = [];
             branches = [];
+            i = 0;
+            z_trend = 2.0;
+            ideal_z = 0;
 
             //Current position
             p = {x: x_pos, y: y_pos, z: 0};
@@ -165,13 +169,29 @@ var LightningGenerator =
         reset_lightning();
 
         var branch_direction = Math.random() * 3.0 - 1.5;
+        var ideal_segments = height/40.0 * 0.95;
         while (p.z < height) {
             if (Math.random() < branch_p)
             {
                 var branch = this.generate_branch(p, Math.random() * 0.5 * height, branch_direction, branch_p);
                 branches = branches.concat(branch);
             }
-            var gen_data = this.generate_lightning_point(p, v1, v2, v3, 1.0);
+
+            //Penalizing too much curvature downwards
+            if(p.z < ideal_z)
+            {
+                z_trend += 0.2;
+                if(z_trend > 3.0)
+                {
+                    ideal_segments++;
+                }
+            }
+            else
+            {
+                z_trend -= 0.2;
+            }
+
+            var gen_data = this.generate_lightning_point(p, v1, v2, v3, z_trend);
 
             p = gen_data.p;
             v1 = gen_data.v1;
@@ -185,6 +205,9 @@ var LightningGenerator =
                 p.y < y_pos - width / 2 || p.y > y_pos + width / 2) {
                 reset_lightning();
             }
+            i++;
+            ideal_z = (height+0.0) / ideal_segments * i;
+            console.log(ideal_z);
         }
 
         //Generate the "crown" inside the cloud

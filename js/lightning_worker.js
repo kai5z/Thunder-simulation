@@ -142,7 +142,7 @@ var LightningWorker =
         h = new Array(this.df_fir_length);
         for(var i = 0; i < samples.length; i++)
         {
-            s = (this.settings.cs * i) / (this.settings.Fs * 1000.0);
+            s = 1.5 * (this.settings.cs * i) / (this.settings.Fs * 1000.0); //1.5 x the attenuation
             this.get_dist_fir(s,h,this.settings.Fs);
 
             /*
@@ -208,7 +208,7 @@ self.addEventListener('message', function(e) {
 
     self.postMessage({'process': 1.0});
 
-    var pts = LightningWorker.divide(lightning.main,listener,0.25*settings.cs/settings.Fs);
+    var pts = LightningWorker.divide(lightning.main,listener,0.5*settings.cs/settings.Fs);
     //console.log("Points: " + pts.length);
     var brode_pulse = {length: 0};
     var max_t = 0;
@@ -310,6 +310,10 @@ self.addEventListener('message', function(e) {
         for(var j = 0; j < brode_pulse.length; j++)
         {
             thunder[pts[i].s+j] += pts[i].A*brode_pulse[j];
+        }
+        if(i % 1000 == 0)
+        {
+            self.postMessage({'process': 15.0 + (i/pts.length*15.0)});
         }
     }
 
