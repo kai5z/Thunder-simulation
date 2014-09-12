@@ -80,9 +80,9 @@ var LightningWorker =
             {
                 div_point = this.point_between_points(l_points[i-1],l_points[i],j/divisions);
                 //Add micro-/mesotortuosity (small randomness between the macrotortuos segments)
-                div_point.x += p_length * (Math.random() * 0.2 - 0.1);
-                div_point.y += p_length * (Math.random() * 0.2 - 0.1);
-                div_point.z += p_length * (Math.random() * 0.2 - 0.1);
+                div_point.x += p_length * (Math.random() * 0.3 - 0.15);
+                div_point.y += p_length * (Math.random() * 0.3 - 0.15);
+                div_point.z += p_length * (Math.random() * 0.3 - 0.15);
                 lightning_points.push(div_point);
                 lightning_points[lightning_points.length-1].length = p_length;
             }
